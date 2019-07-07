@@ -1,6 +1,3 @@
-variable "do_token" {}
-variable "do_cluster_name" {}
-
 # Get a Digital Ocean token from your Digital Ocean account
 #   See: https://www.digitalocean.com/docs/api/create-personal-access-token/
 # Set TF_VAR_do_token to use your Digital Ocean token automatically
