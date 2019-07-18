@@ -1,3 +1,4 @@
+# what url should we use for dockerhub registry: https://stackoverflow.com/questions/34198392/docker-official-registry-docker-hub-url
 # docker_registry_url = "docker.io"
 docker_registry_url = "https://index.docker.io/v1/"
 

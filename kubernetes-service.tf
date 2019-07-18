@@ -1,7 +1,7 @@
 resource "kubernetes_service" "app" {
   metadata {
     name = "${var.app_name}-service"
-    namespace = "${kubernetes_deployment.app.metadata.0.namespace}"
+    namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
   }
   spec {
     type = "ClusterIP"

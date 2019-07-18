@@ -7,6 +7,8 @@ resource "kubernetes_service_account" "tiller" {
   metadata {
     name      = "tiller-service-account"
     namespace = "kube-system"
+    # namespace = "${kubernetes_namespace.app.metadata.0.name}"
+    # namespace = "${var.app_namespace}"
   }
 }
 
@@ -34,16 +36,19 @@ resource "kubernetes_cluster_role_binding" "tiller" {
 #
 #
 resource "kubernetes_service_account" "cicd" {
+    # https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   automount_service_account_token = true
 
   metadata {
+
     name      = "cicd-service-account"
-    namespace = "${kubernetes_namespace.app.metadata.0.name}"
+    # namespace = "${kubernetes_namespace.app.metadata.0.name}"
+    namespace = "${var.app_namespace}"
   }
 
-  image_pull_secret {
-    name = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  }
+#   image_pull_secret {
+#     name = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+#   }
 }
 
 
@@ -81,20 +86,23 @@ resource "kubernetes_role_binding" "cicd" {
 }
 
 locals {
-  dockercfg = {
-    "${var.docker_registry_url}" = {
-      email    = "${var.docker_email}"
-      username = "${var.docker_username}"
-      password = "${var.docker_password}"
-      auth = "${base64encode(format("%s:%s", var.docker_username, var.docker_password))}"
+    dockercfg = {
+        auths = {
+            "${var.docker_registry_url}" = {
+                email    = "${var.docker_email}"
+                username = "${var.docker_username}"
+                password = "${var.docker_password}"
+                auth = "${base64encode(format("%s:%s", var.docker_username, var.docker_password))}"
+            }
+        }
     }
-  }
 }
 
+# k8 official doc on dockerconfigjson: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
 resource "kubernetes_secret" "dockerhub_secret" {
   metadata {
     name = "dockerhub-secret"
-    namespace = "${kubernetes_namespace.app.metadata.0.name}"
+    namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
   }
 
   data = {
