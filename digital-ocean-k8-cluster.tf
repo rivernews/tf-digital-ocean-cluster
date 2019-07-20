@@ -49,17 +49,3 @@ resource "kubernetes_namespace" "app" {
     name = "${var.app_namespace}"
   }
 }
-
-# initialize Helm provider
-provider "helm" {
-  install_tiller = true
-  service_account = "${kubernetes_service_account.tiller.metadata.0.name}"
-  tiller_image = "gcr.io/kubernetes-helm/tiller:v2.11.0"
-
-  kubernetes {
-    host = "${digitalocean_kubernetes_cluster.project_digital_ocean_cluster.endpoint}"
-    client_certificate     = "${base64decode(digitalocean_kubernetes_cluster.project_digital_ocean_cluster.kube_config.0.client_certificate)}"
-    client_key             = "${base64decode(digitalocean_kubernetes_cluster.project_digital_ocean_cluster.kube_config.0.client_key)}"
-    cluster_ca_certificate = "${base64decode(digitalocean_kubernetes_cluster.project_digital_ocean_cluster.kube_config.0.cluster_ca_certificate)}"
-  }
-}
